@@ -26,39 +26,38 @@ import io.netty.example.telnet.TelnetServer;
  */
 public class SecureChatServer {
 
-    private final int port;
+	private final int port;
 
-    private final String sslMode;
+	private final String sslMode;
 
-    public SecureChatServer(int port, String sslMode) {
-	this.port = port;
-	this.sslMode = sslMode;
-    }
-
-    public void run() throws InterruptedException {
-	EventLoopGroup bossGroup = new NioEventLoopGroup();
-	EventLoopGroup workerGroup = new NioEventLoopGroup();
-	try {
-	    ServerBootstrap b = new ServerBootstrap();
-	    b.group(bossGroup, workerGroup)
-		    .channel(NioServerSocketChannel.class)
-		    .childHandler(new SecureChatServerInitializer(sslMode));
-
-	    b.bind(port).sync().channel().closeFuture().sync();
-	} finally {
-	    bossGroup.shutdownGracefully();
-	    workerGroup.shutdownGracefully();
+	public SecureChatServer(int port, String sslMode) {
+		this.port = port;
+		this.sslMode = sslMode;
 	}
-    }
 
-    public static void main(String[] args) throws Exception {
-	if (args.length != 1) {
-	    System.err.println("Please input ssl mode");
-	    System.exit(-1);
+	public void run() throws InterruptedException {
+		EventLoopGroup bossGroup = new NioEventLoopGroup();
+		EventLoopGroup workerGroup = new NioEventLoopGroup();
+		try {
+			ServerBootstrap b = new ServerBootstrap();
+			b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
+					.childHandler(new SecureChatServerInitializer(sslMode));
 
+			b.bind(port).sync().channel().closeFuture().sync();
+		} finally {
+			bossGroup.shutdownGracefully();
+			workerGroup.shutdownGracefully();
+		}
 	}
-	String sslMode = args[0];
-	int port = 8443;
-	new SecureChatServer(port, sslMode).run();
-    }
+
+	public static void main(String[] args) throws Exception {
+		if (args.length != 1) {
+			System.err.println("Please input ssl mode");
+			System.exit(-1);
+
+		}
+		String sslMode = args[0];
+		int port = 8443;
+		new SecureChatServer(port, sslMode).run();
+	}
 }
